@@ -7,6 +7,7 @@ from bs4.element import Comment
 from PIL import Image
 from io import BytesIO
 from selenium import webdriver
+from selenium.common import exceptions
 from selenium.webdriver.remote.webdriver import WebDriver
 
 
@@ -116,7 +117,12 @@ class Chrome:
 
         # Fetch HTML/CSS and screenshot it
         driver = self.recycled_driver()
-        driver.get(f"data:text/html;charset=utf-8,{urllib.parse.quote(html_website)}")
+
+        try:
+            driver.get(f"data:text/html;charset=utf-8,{urllib.parse.quote(html_website)}")
+        except exceptions.TimeoutException:
+            return await self.screenshot("<h1>Timeout</h1><p>Took too long to fetch content...", None)
+
         element = driver.find_element_by_id("capture")
         location = element.location
         size = element.size
