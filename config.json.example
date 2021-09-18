@@ -1,0 +1,6 @@
+{
+  "debug": false,
+  "port": 8080,
+  "chromedriver_path": "./bin/chromedriver.exe",
+  "proxies": []
+}
