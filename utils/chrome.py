@@ -1,5 +1,9 @@
+import asyncio
 import urllib
+import re
 
+from bs4 import BeautifulSoup
+from bs4.element import Comment
 from PIL import Image
 from io import BytesIO
 from selenium import webdriver
@@ -20,6 +24,8 @@ class Chrome:
         self.driver = webdriver.Chrome(
             executable_path=self.chromedriver, options=options
         )
+
+        self.driver.set_page_load_timeout(5)
 
         self.session_id = self.driver.session_id
         self.executor_url = self.driver.command_executor._url
@@ -47,11 +53,64 @@ class Chrome:
         WebDriver.execute = original_execute
         return driver
 
-    async def screenshot(self, html: str, css: str):
+    def sanitize(self, untrusted_html: str):
+        """ Check HTML for bad attempts """
+        tag_whitelist = [
+            "a", "abbr", "address", "b", "code",
+            "cite", "code", "em", "i", "ins", "kbd",
+            "q", "samp", "small", "strike", "strong",
+            "sub", "var", "p", "span", "div", "h1",
+            "h2", "h3", "h4", "h5", "h6", "pre", "img", "style"
+        ]
+
+        tag_blacklist = ["script", "iframe"]
+
+        attributes_with_urls = ["href", "src"]
+        safe_attributes = ["alt", "title", "id", "class", "name"]
+
+        attr_whitelist = {
+            "a": ["href", "title"],
+            "img": ["src", "alt", "width", "height", "title"],
+        }
+
+        soup = BeautifulSoup(untrusted_html, features="lxml")
+        for comment in soup.findAll(text=lambda text: isinstance(text, Comment)):
+            comment.extract()
+
+        for tag in soup.findAll():
+            tag_name = tag.name.lower()
+            if tag_name in tag_blacklist:
+                tag.extract()
+            elif tag_name not in tag_whitelist:
+                tag.hidden = True
+            else:
+                for attr, value in list(tag.attrs.items()):
+                    if attr.lower() in safe_attributes:
+                        continue  # This one is 100% safe
+
+                    if tag_name in attr_whitelist and attr.lower() in attr_whitelist[tag_name]:
+                        if attr.lower() in attributes_with_urls:
+                            if not re.match(r"(https?|ftp)://", value.lower()):
+                                del tag.attrs[attr]
+                    else:
+                        del tag.attrs[attr]
+
+        return soup.decode("utf8")
+
+    async def screenshot(self, driver):
+        """ Screenshot from driver """
+        image = driver.get_screenshot_as_png()
+        return image
+
+    async def render(self, html: str, css: str):
         """ Make Chrome get a website and screenshot it """
+        # Check for bad arguments
+        html = self.sanitize(html)
+
+        # Create a sanitized HTML string
         html_website = f"<html><body>" \
-                       f'<div id="capture">{html}</div><style>{css}</style>' \
-                       "<style>html, body { background: transparent; margin: auto 0; }" \
+                       f'<div id="capture">{html or "placeholder..."}</div><style>{css or ""}</style>' \
+                       "<style>html, body { margin: auto 0; }" \
                        "#capture { display: inline-block; height: auto; width: auto; }" \
                        "</style></body></html>"
 
@@ -61,16 +120,35 @@ class Chrome:
         element = driver.find_element_by_id("capture")
         location = element.location
         size = element.size
-        png = driver.get_screenshot_as_png()
+
+        async def create_png():
+            image_output = asyncio.ensure_future(self.screenshot(driver))
+            await image_output
+            return image_output.result()
+
+        try:
+            png = await asyncio.wait_for(create_png(), timeout=3)
+        except asyncio.TimeoutError:
+            return await self.screenshot("<h1>Timeout</h1><p>Took too long to render...", None)
 
         # Now render screenshot Bytes
-        b = BytesIO()
-        im = Image.open(BytesIO(png))
-        left = location["x"]
-        top = location["y"]
-        right = location["x"] + size["width"]
-        bottom = location["y"] + size["height"]
-        im = im.crop((left, top, right, bottom))
-        im.save(b, "PNG")
+        try:
+            b = BytesIO()
+            im = Image.open(BytesIO(png))
+            left = location["x"]
+            top = location["y"]
+            right = location["x"] + size["width"]
+            bottom = location["y"] + size["height"]
+            im = im.crop((left, top, right, bottom))
+        except Image.DecompressionBombError:
+            return await self.screenshot("<h1>Detected decompression bomb DOS attack, stopping...</h1>", None)
+        except Image.DecompressionBombWarning:
+            return await self.screenshot("<h1>Possible decompression bomb DOS attack, stopping...</h1>", None)
+
+        try:
+            im.save(b, "PNG")
+        except SystemError:
+            return await self.screenshot("<h1>placeholder...</h1>", None)
+
         b.seek(0)
         return b

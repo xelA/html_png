@@ -43,13 +43,10 @@ async def html_engine():
 
     before_ping = time.monotonic()
     image_output = asyncio.ensure_future(
-        chrome.screenshot(html, css), loop=loop
+        chrome.render(html, css), loop=loop
     )
 
-    try:
-        await image_output
-    except SystemError:
-        abort(400, "Failed to render image...")
+    await image_output
 
     after_ping = int((time.monotonic() - before_ping) * 1000)
     debug_print(f"Took {after_ping}ms to produce the image")
