@@ -110,7 +110,7 @@ class Chrome:
 
         # Create a sanitized HTML string
         html_website = f"<html><body>" \
-                       f'<div id="capture">{html or "placeholder..."}</div><style>{css or ""}</style>' \
+                       f'<div id="capture">{html or "placeholder"}</div><style>{css or ""}</style>' \
                        "<style>html, body { margin: auto 0; }" \
                        "#capture { display: inline-block; height: auto; width: auto; }" \
                        "</style></body></html>"
@@ -121,7 +121,7 @@ class Chrome:
         try:
             driver.get(f"data:text/html;charset=utf-8,{urllib.parse.quote(html_website)}")
         except exceptions.TimeoutException:
-            return await self.screenshot("<h1>Timeout</h1><p>Took too long to fetch content...", None)
+            return await self.render("<h1>Timeout</h1><p>Took too long to fetch content...", None)
 
         element = driver.find_element_by_id("capture")
         location = element.location
@@ -135,7 +135,7 @@ class Chrome:
         try:
             png = await asyncio.wait_for(create_png(), timeout=3)
         except asyncio.TimeoutError:
-            return await self.screenshot("<h1>Timeout</h1><p>Took too long to render...", None)
+            return await self.render("<h1>Timeout</h1><p>Took too long to render...", None)
 
         # Now render screenshot Bytes
         try:
@@ -147,14 +147,14 @@ class Chrome:
             bottom = location["y"] + size["height"]
             im = im.crop((left, top, right, bottom))
         except Image.DecompressionBombError:
-            return await self.screenshot("<h1>Detected decompression bomb DOS attack, stopping...</h1>", None)
+            return await self.render("<h1>Detected decompression bomb DOS attack, stopping...</h1>", None)
         except Image.DecompressionBombWarning:
-            return await self.screenshot("<h1>Possible decompression bomb DOS attack, stopping...</h1>", None)
+            return await self.render("<h1>Possible decompression bomb DOS attack, stopping...</h1>", None)
 
         try:
             im.save(b, "PNG")
         except SystemError:
-            return await self.screenshot("<h1>placeholder...</h1>", None)
+            return await self.render("<h1>placeholder...</h1>", None)
 
         b.seek(0)
         return b
