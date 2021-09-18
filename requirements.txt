@@ -2,3 +2,4 @@ selenium
 quart
 Pillow
 beautifulsoup4
+lxml
