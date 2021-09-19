@@ -1,6 +1,7 @@
 import asyncio
 import urllib
 import re
+import htmlmin
 
 from bs4 import BeautifulSoup
 from bs4.element import Comment
@@ -12,11 +13,14 @@ from selenium.webdriver.remote.webdriver import WebDriver
 
 
 class Chrome:
-    def __init__(self, chromedriver: str = "", proxy: str = None):
+    def __init__(self, chromedriver: str = "", proxy: str = None, headless: bool = True):
         self.chromedriver = chromedriver
 
         options = webdriver.ChromeOptions()
-        for g in ["--headless", "--log-level=3", "--window-size=1000x1000"]:
+        if headless:
+            options.add_argument("--headless")
+
+        for g in ["--log-level=3", "--window-size=1500x1500"]:
             options.add_argument(g)
 
         if proxy and isinstance(proxy, str):
@@ -96,7 +100,11 @@ class Chrome:
                     else:
                         del tag.attrs[attr]
 
-        return soup.decode("utf8")
+        return htmlmin.minify(
+            str(soup),
+            remove_empty_space=True,
+            remove_comments=True
+        )
 
     async def screenshot(self, driver):
         """ Screenshot from driver """

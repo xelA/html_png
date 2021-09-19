@@ -16,13 +16,14 @@ with open("./config.json", "r", encoding="utf8") as f:
     config = json.load(f)
 
 chrome = Chrome(
-    chromedriver=config["chromedriver_path"],
-    proxy=random.choice(config["proxies"]) if config["proxies"] else None
+    chromedriver=config.get("chromedriver_path", ""),
+    proxy=random.choice(config["proxies"]) if config.get("proxies", None) else None,
+    headless=config.get("chrome_headless", True)
 )
 
 
 def debug_print(message: str):
-    if config["debug"]:
+    if config.get("debug", False):
         print(message)
 
 
@@ -58,7 +59,7 @@ async def html_engine():
     )
 
 app.run(
-    port=config["port"],
-    debug=config["debug"],
+    port=config.get("port", 8080),
+    debug=config.get("debug", False),
     loop=loop
 )

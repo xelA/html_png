@@ -1,5 +1,6 @@
 {
   "debug": false,
+  "chrome_headless": true,
   "port": 8080,
   "chromedriver_path": "./bin/chromedriver.exe",
   "proxies": []
