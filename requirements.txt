@@ -3,3 +3,4 @@ quart
 Pillow
 beautifulsoup4
 lxml
+htmlmin
