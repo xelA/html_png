@@ -78,7 +78,7 @@ class Chrome:
             "img": ["src", "alt", "width", "height", "title"],
         }
 
-        soup = BeautifulSoup(untrusted_html, features="lxml")
+        soup = BeautifulSoup(untrusted_html, features="html.parser")
         for comment in soup.findAll(text=lambda text: isinstance(text, Comment)):
             comment.extract()
 
