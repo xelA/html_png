@@ -71,7 +71,7 @@ class Chrome:
         tag_blacklist = ["script", "iframe"]
 
         attributes_with_urls = ["href", "src"]
-        safe_attributes = ["alt", "title", "id", "class", "name"]
+        safe_attributes = ["alt", "title", "id", "class", "name", "style"]
 
         attr_whitelist = {
             "a": ["href", "title"],
