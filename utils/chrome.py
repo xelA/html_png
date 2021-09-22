@@ -64,7 +64,7 @@ class Chrome:
             "a", "abbr", "address", "b", "code",
             "cite", "code", "em", "i", "ins", "kbd",
             "q", "samp", "small", "strike", "strong",
-            "sub", "var", "p", "span", "div", "h1",
+            "sub", "var", "p", "span", "div", "h1", "br",
             "h2", "h3", "h4", "h5", "h6", "pre", "img", "style"
         ]
 
