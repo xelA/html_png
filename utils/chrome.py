@@ -122,8 +122,8 @@ class Chrome:
         # Create a sanitized HTML string
         html_website = f"<html><body>" \
                        f'<div id="capture">{html or "placeholder"}</div><style>{css or ""}</style>' \
-                       "<style>html, body { margin: auto 0; }" \
-                       "#capture { display: inline-block; height: auto; width: auto; position: relative; }" \
+                       "<style>html, body { margin: auto 0; overflow: hidden; }" \
+                       "#capture { display: inline-block; height: auto; width: auto; position: relative; overflow: hidden; }" \
                        "</style></body></html>"
 
         # Fetch HTML/CSS and screenshot it
