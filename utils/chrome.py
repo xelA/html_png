@@ -67,7 +67,8 @@ class Chrome:
             "q", "samp", "small", "strike", "strong",
             "sub", "var", "p", "span", "div", "h1", "br",
             "h2", "h3", "h4", "h5", "h6", "pre", "img", "style",
-            "table", "tbody", "thead", "th", "tr", "td"
+            "table", "tbody", "thead", "th", "tr", "td", "footer",
+            "section", "main"
         ]
 
         tag_blacklist = ["script", "iframe"]
@@ -122,7 +123,7 @@ class Chrome:
         html_website = f"<html><body>" \
                        f'<div id="capture">{html or "placeholder"}</div><style>{css or ""}</style>' \
                        "<style>html, body { margin: auto 0; }" \
-                       "#capture { display: inline-block; height: auto; width: auto; }" \
+                       "#capture { display: inline-block; height: auto; width: auto; position: relative; }" \
                        "</style></body></html>"
 
         # Fetch HTML/CSS and screenshot it
