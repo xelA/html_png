@@ -97,11 +97,11 @@ class Chrome:
                         continue  # This one is 100% safe
 
                     if tag_name in attr_whitelist and attr.lower() in attr_whitelist[tag_name]:
-                        if attr.lower() in attributes_with_urls:
+                        if attr == "rel" and value != "stylesheet":
+                            del tag.attrs[attr]
+                        elif attr.lower() in attributes_with_urls:
                             if not re.match(r"(https?|ftp)://", value.lower()):
                                 del tag.attrs[attr]
-                    elif attr == "rel" and value == "stylesheet":
-                        continue
                     else:
                         del tag.attrs[attr]
 
