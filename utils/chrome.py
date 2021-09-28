@@ -63,7 +63,7 @@ class Chrome:
         """ Check HTML for bad attempts """
         tag_whitelist = [
             "a", "abbr", "address", "b", "code",
-            "cite", "pre", "em", "i", "ins", "kbd",
+            "cite", "em", "i", "ins", "kbd",
             "q", "samp", "small", "strike", "strong",
             "sub", "var", "p", "span", "div", "h1", "br",
             "h2", "h3", "h4", "h5", "h6", "pre", "img", "style",
@@ -96,7 +96,7 @@ class Chrome:
                         continue  # This one is 100% safe
 
                     if tag_name in attr_whitelist and attr.lower() in attr_whitelist[tag_name]:
-                        elif attr.lower() in attributes_with_urls:
+                        if attr.lower() in attributes_with_urls:
                             if not re.match(r"(https?|ftp)://", value.lower()):
                                 del tag.attrs[attr]
                     else:
