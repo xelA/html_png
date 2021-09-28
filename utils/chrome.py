@@ -67,7 +67,7 @@ class Chrome:
             "q", "samp", "small", "strike", "strong",
             "sub", "var", "p", "span", "div", "h1", "br",
             "h2", "h3", "h4", "h5", "h6", "pre", "img", "style",
-            "table", "tbody", "thead", "th", "tr", "td", "link"
+            "table", "tbody", "thead", "th", "tr", "td"
         ]
 
         tag_blacklist = ["script", "iframe"]
@@ -77,8 +77,7 @@ class Chrome:
 
         attr_whitelist = {
             "a": ["href", "title"],
-            "img": ["src", "alt", "width", "height", "title"],
-            "link": ["rel", "href"],
+            "img": ["src", "alt", "width", "height", "title"]
         }
 
         soup = BeautifulSoup(untrusted_html, features="html.parser")
@@ -97,8 +96,6 @@ class Chrome:
                         continue  # This one is 100% safe
 
                     if tag_name in attr_whitelist and attr.lower() in attr_whitelist[tag_name]:
-                        if attr == "rel" and value != "stylesheet":
-                            del tag.attrs[attr]
                         elif attr.lower() in attributes_with_urls:
                             if not re.match(r"(https?|ftp)://", value.lower()):
                                 del tag.attrs[attr]
