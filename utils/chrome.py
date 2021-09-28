@@ -63,10 +63,11 @@ class Chrome:
         """ Check HTML for bad attempts """
         tag_whitelist = [
             "a", "abbr", "address", "b", "code",
-            "cite", "code", "em", "i", "ins", "kbd",
+            "cite", "pre", "em", "i", "ins", "kbd",
             "q", "samp", "small", "strike", "strong",
             "sub", "var", "p", "span", "div", "h1", "br",
-            "h2", "h3", "h4", "h5", "h6", "pre", "img", "style"
+            "h2", "h3", "h4", "h5", "h6", "pre", "img", "style",
+            "table", "tbody", "thead", "th", "tr", "td", "link"
         ]
 
         tag_blacklist = ["script", "iframe"]
@@ -77,6 +78,7 @@ class Chrome:
         attr_whitelist = {
             "a": ["href", "title"],
             "img": ["src", "alt", "width", "height", "title"],
+            "link": ["rel", "href", "crossorigin"],
         }
 
         soup = BeautifulSoup(untrusted_html, features="html.parser")
