@@ -13,8 +13,9 @@ from selenium.webdriver.remote.webdriver import WebDriver
 
 
 class Chrome:
-    def __init__(self, chromedriver: str = "", proxy: str = None, headless: bool = True):
+    def __init__(self, chromedriver: str = "", proxy: str = None, headless: bool = True, timeout: int = 5):
         self.chromedriver = chromedriver
+        self.timeout = timeout
 
         options = webdriver.ChromeOptions()
         if headless:
@@ -30,7 +31,7 @@ class Chrome:
             executable_path=self.chromedriver, options=options
         )
 
-        self.driver.set_page_load_timeout(5)
+        self.driver.set_page_load_timeout(self.timeout)
 
         self.session_id = self.driver.session_id
         self.executor_url = self.driver.command_executor._url
@@ -141,7 +142,7 @@ class Chrome:
             return image_output.result()
 
         try:
-            png = await asyncio.wait_for(create_png(), timeout=3)
+            png = await asyncio.wait_for(create_png(), timeout=self.timeout)
         except asyncio.TimeoutError:
             return await self.render("<h1>Timeout</h1><p>Took too long to render...", None)
 
