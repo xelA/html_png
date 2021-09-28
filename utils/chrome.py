@@ -78,7 +78,7 @@ class Chrome:
         attr_whitelist = {
             "a": ["href", "title"],
             "img": ["src", "alt", "width", "height", "title"],
-            "link": ["rel", "href", "crossorigin"],
+            "link": ["rel", "href"],
         }
 
         soup = BeautifulSoup(untrusted_html, features="html.parser")
@@ -100,6 +100,8 @@ class Chrome:
                         if attr.lower() in attributes_with_urls:
                             if not re.match(r"(https?|ftp)://", value.lower()):
                                 del tag.attrs[attr]
+                    elif attr == "rel" and value == "stylesheet":
+                        continue
                     else:
                         del tag.attrs[attr]
 
