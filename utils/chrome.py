@@ -68,17 +68,22 @@ class Chrome:
             "sub", "var", "p", "span", "div", "h1", "br",
             "h2", "h3", "h4", "h5", "h6", "pre", "img", "style",
             "table", "tbody", "thead", "th", "tr", "td", "footer",
-            "section", "main"
+            "section", "main", "svg", "path", "g", "foreignObject",
+            "rect"
         ]
 
         tag_blacklist = ["script", "iframe"]
 
         attributes_with_urls = ["href", "src"]
-        safe_attributes = ["alt", "title", "id", "class", "name", "style"]
+        safe_attributes = ["alt", "title", "id", "class", "name", "style", "viewBox", "fill"]
 
         attr_whitelist = {
             "a": ["href", "title"],
-            "img": ["src", "alt", "width", "height", "title"]
+            "img": ["src", "alt", "width", "height", "title"],
+            "rect": ["width", "height", "x", "y"],
+            "path": ["d"],
+            "svg": ["width", "height"],
+            "foreignObject": ["x", "y", "width", "height", "mask"],
         }
 
         soup = BeautifulSoup(untrusted_html, features="html.parser")
