@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from bs4.element import Comment
 from PIL import Image
 from io import BytesIO
+from utils import svg_elements
 from selenium import webdriver
 from selenium.common import exceptions
 from selenium.webdriver.remote.webdriver import WebDriver
@@ -79,11 +80,7 @@ class Chrome:
 
         attr_whitelist = {
             "a": ["href", "title"],
-            "img": ["src", "alt", "width", "height", "title"],
-            "rect": ["width", "height", "x", "y"],
-            "path": ["d"],
-            "svg": ["width", "height"],
-            "foreignObject": ["x", "y", "width", "height", "mask"],
+            "img": ["src", "alt", "width", "height", "title"]
         }
 
         soup = BeautifulSoup(untrusted_html, features="html.parser")
@@ -101,7 +98,10 @@ class Chrome:
                     if attr.lower() in safe_attributes:
                         continue  # This one is 100% safe
 
-                    if tag_name in attr_whitelist and attr.lower() in attr_whitelist[tag_name]:
+                    if tag_name in svg_elements.elements:
+                        if attr.lower() not in svg_elements.attributes:
+                            del tag.attrs[attr]
+                    elif tag_name in attr_whitelist and attr.lower() in attr_whitelist[tag_name]:
                         if attr.lower() in attributes_with_urls:
                             if not re.match(r"(https?|ftp)://", value.lower()):
                                 del tag.attrs[attr]
