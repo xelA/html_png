@@ -91,7 +91,7 @@ class Chrome:
             tag_name = tag.name.lower()
             if tag_name in tag_blacklist:
                 tag.extract()
-            elif tag_name not in tag_whitelist:
+            elif tag_name not in tag_whitelist and tag_name not in svg_elements.elements:
                 tag.hidden = True
             else:
                 for attr, value in list(tag.attrs.items()):
