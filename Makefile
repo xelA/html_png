@@ -9,4 +9,10 @@ start: ## Create a PM2 instance of the website and start it
 
 clean: ## Remove/kill anything related to the API (Linux only)
 	sudo pkill -9 chrome
-	pm2 delete Chrome_HTML
+	pm2 delete pm2.json
+
+clean_update:
+	sudo pkill -9 chrome
+	pm2 delete pm2.json
+	git pull
+	pm2 start pm2.json
