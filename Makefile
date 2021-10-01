@@ -7,11 +7,11 @@ help: ## Shows this message as we speak
 start: ## Create a PM2 instance of the website and start it
 	pm2 start pm2.json
 
-clean: ## Remove/kill anything related to the API (Linux only)
+clean: ## Kills the process (Linux only)
 	sudo pkill -9 chrome
 	pm2 delete pm2.json
 
-clean_update:
+clean_update: ## Kills the process, pulls from GitHub and runs again (Linux only)
 	sudo pkill -9 chrome
 	pm2 delete pm2.json
 	git pull
