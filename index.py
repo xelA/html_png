@@ -9,7 +9,8 @@ from utils.chrome import Chrome
 
 
 app = Quart(__name__)
-loop = asyncio.get_event_loop()
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
 logging.getLogger("asyncio").setLevel(logging.CRITICAL)
 
 with open("./config.json", "r", encoding="utf8") as f:
