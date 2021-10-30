@@ -70,7 +70,7 @@ class Chrome:
             "h2", "h3", "h4", "h5", "h6", "pre", "img", "style",
             "table", "tbody", "thead", "th", "tr", "td", "footer",
             "section", "main", "svg", "path", "g", "foreignObject",
-            "rect"
+            "rect", "ul", "ol", "li"
         ]
 
         tag_blacklist = ["script", "iframe"]
