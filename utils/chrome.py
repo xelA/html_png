@@ -2,6 +2,7 @@ import asyncio
 import urllib
 import re
 import htmlmin
+import os
 
 from bs4 import BeautifulSoup
 from bs4.element import Comment
@@ -108,11 +109,14 @@ class Chrome:
                     else:
                         del tag.attrs[attr]
 
-        return htmlmin.minify(
-            str(soup),
-            remove_empty_space=True,
-            remove_comments=True
-        )
+        if os.name == "nt":
+            return str(soup)
+        else:
+            return htmlmin.minify(
+                str(soup),
+                remove_empty_space=True,
+                remove_comments=True
+            )
 
     async def screenshot(self, driver):
         """ Screenshot from driver """
