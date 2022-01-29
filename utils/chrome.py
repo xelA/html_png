@@ -1,6 +1,7 @@
 import asyncio
 import urllib
 import re
+import json
 import htmlmin
 import os
 
@@ -34,6 +35,12 @@ class Chrome:
         )
 
         self.driver.set_page_load_timeout(self.timeout)
+
+        # This will make the default #FFFFFF background transparent with screenshots
+        self.send(
+            self.driver, "Emulation.setDefaultBackgroundColorOverride",
+            {"color": {"r": 0, "g": 0, "b": 0, "a": 0}}
+        )
 
         self.session_id = self.driver.session_id
         self.executor_url = self.driver.command_executor._url
@@ -122,6 +129,15 @@ class Chrome:
         """ Screenshot from driver """
         image = driver.get_screenshot_as_png()
         return image
+
+    def send(self, driver, cmd, params={}):
+        resource = f"/session/{driver.session_id}/chromium/send_command_and_get_result"
+        url = driver.command_executor._url + resource
+        body = json.dumps({"cmd": cmd, "params": params})
+        response = driver.command_executor._request("POST", url, body)
+        if response.get("status", None):
+            raise Exception(response.get("value"))
+        return response.get("value")
 
     async def render(self, html: str, css: str):
         """ Make Chrome get a website and screenshot it """
