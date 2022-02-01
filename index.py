@@ -19,7 +19,8 @@ with open("./config.json", "r", encoding="utf8") as f:
 chrome = Chrome(
     chromedriver=config.get("chromedriver_path", ""),
     proxy=random.choice(config["proxies"]) if config.get("proxies", None) else None,
-    headless=config.get("chrome_headless", True)
+    headless=config.get("chrome_headless", True),
+    timeout=config.get("chrome_timeout", 5)
 )
 
 
