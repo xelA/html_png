@@ -18,7 +18,7 @@ from selenium.webdriver.remote.webdriver import WebDriver
 class Chrome:
     def __init__(
         self, chromedriver: str = "", proxy: str = None, headless: bool = True,
-        timeout: int = 5, window_size: tuple = (1920, 1080)
+        timeout: int = 5, window_size: list = [1920, 1080]
     ):
         self.chromedriver = chromedriver
         self.timeout = timeout
@@ -27,7 +27,7 @@ class Chrome:
         if headless:
             options.add_argument("--headless")
 
-        if not isinstance(window_size, tuple):
+        if not isinstance(window_size, list):
             raise TypeError("window_size must be a tuple")
         x_size, y_size = window_size
 
