@@ -16,7 +16,10 @@ from selenium.webdriver.remote.webdriver import WebDriver
 
 
 class Chrome:
-    def __init__(self, chromedriver: str = "", proxy: str = None, headless: bool = True, timeout: int = 5):
+    def __init__(
+        self, chromedriver: str = "", proxy: str = None, headless: bool = True,
+        timeout: int = 5, window_size: tuple = (1920, 1080)
+    ):
         self.chromedriver = chromedriver
         self.timeout = timeout
 
@@ -24,7 +27,11 @@ class Chrome:
         if headless:
             options.add_argument("--headless")
 
-        for g in ["--log-level=3", "--window-size=1500x1500"]:
+        if not isinstance(window_size, tuple):
+            raise TypeError("window_size must be a tuple")
+        x_size, y_size = window_size
+
+        for g in ["--log-level=3", f"--window-size={x_size}x{y_size}"]:
             options.add_argument(g)
 
         if proxy and isinstance(proxy, str):
