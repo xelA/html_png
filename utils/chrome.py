@@ -28,7 +28,7 @@ class Chrome:
             options.add_argument("--headless")
 
         if not isinstance(window_size, list):
-            raise TypeError("window_size must be a tuple")
+            raise TypeError("window_size must be a list")
         x_size, y_size = window_size
 
         for g in ["--log-level=3", f"--window-size={x_size}x{y_size}"]:
