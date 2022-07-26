@@ -21,7 +21,7 @@ chrome = Chrome(
     proxy=random.choice(config["proxies"]) if config.get("proxies", None) else None,
     headless=config.get("chrome_headless", True),
     timeout=config.get("chrome_timeout", 5),
-    window_size=config.get("chrome_window_size", (1920, 1080))
+    window_size=config.get("chrome_window_size", [1920, 1080])
 )
 
 
