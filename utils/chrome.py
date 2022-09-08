@@ -166,7 +166,7 @@ class Chrome:
         except exceptions.TimeoutException:
             return await self.render("<h1>Timeout</h1><p>Took too long to fetch content...", None)
 
-        element = driver.find_element_by_id("capture")
+        element = driver.find_element("id", "capture")
         location = element.location
         size = element.size
 
