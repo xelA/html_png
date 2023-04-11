@@ -1,8 +1,9 @@
 import requests
+import time
 
 html = """
 <div class="container">
-    <h1>Hello, world</h1>
+    <h1>Hello, world 2</h1>
 </div>
 """
 
@@ -23,13 +24,19 @@ h1 {
 }
 """
 
+start_time = time.time()
+
 r = requests.post(
-    "http://localhost:8080", json={
+    "http://127.0.0.1:8080", json={
         "html": html.replace("\n", ""),
         "css": css.replace("\n", "")
     }
 )
 
+print(f"Rendered in {time.time() - start_time} seconds")
+
 # Save the HTML and CSS to disk
 with open("./render_image_output.png", "wb") as f:
     f.write(r.content)
+
+print(f"Saved to ./render_image_output.png in {time.time() - start_time} seconds")

@@ -37,24 +37,25 @@ async def index():
 
 @app.route("/", methods=["POST"])
 async def html_engine():
+    print(1)
     data = await request.json
-
+    print(2)
     html = data.get("html", None)
     css = data.get("css", None)
-
+    print(3)
     if not html:
         abort(400, "No HTML provided")
-
+    print(4)
     before_ping = time.monotonic()
     image_output = asyncio.ensure_future(
         chrome.render(html, css), loop=loop
     )
-
+    print(5)
     await image_output
-
+    print(6)
     after_ping = int((time.monotonic() - before_ping) * 1000)
     debug_print(f"Took {after_ping}ms to produce the image")
-
+    print(7)
     return await send_file(
         image_output.result(),
         mimetype="image/png",
