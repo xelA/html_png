@@ -4,9 +4,14 @@ import threading
 
 def worker(num):
     print(f"Worker START: {num}")
-    requests.post("http://localhost:8080", json={
-        "html": "<h1>AlexFlipnote</h1>"
-    })
+    r = requests.post(
+        "http://127.0.0.1:8575",
+        json={"html": f"<h1>AlexFlipnote {num}</h1>"}
+    )
+
+    with open(f"./dump/{num}.png", "wb") as f:
+        f.write(r.content)
+
     print(f"Worker END: {num}")
     return
 

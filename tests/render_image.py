@@ -27,7 +27,7 @@ h1 {
 start_time = time.time()
 
 r = requests.post(
-    "http://127.0.0.1:8080", json={
+    "http://127.0.0.1:8575", json={
         "html": html.replace("\n", ""),
         "css": css.replace("\n", "")
     }

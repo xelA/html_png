@@ -1,3 +1,6 @@
+tests/dump/*
+!tests/dump/.gitkeep
+
 config.json
 tests/*.png
 

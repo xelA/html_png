@@ -12,33 +12,36 @@ from io import BytesIO
 from utils import svg_elements
 from selenium import webdriver
 from selenium.common import exceptions
-from selenium.webdriver.remote.webdriver import WebDriver
 
 
 class Chrome:
     def __init__(
-        self, chromedriver: str = "", proxy: str = None, headless: bool = True,
-        timeout: int = 5, window_size: list = [1920, 1080]
+        self,
+        chromedriver: str = "",
+        proxy: str = None,
+        headless: bool = True,
+        timeout: int = 5,
+        window_size: list = [1920, 1080]
     ):
         self.chromedriver = chromedriver
         self.timeout = timeout
 
-        options = webdriver.ChromeOptions()
+        self.options = webdriver.ChromeOptions()
         if headless:
-            options.add_argument("--headless")
+            self.options.add_argument("--headless")
 
         if not isinstance(window_size, list):
             raise TypeError("window_size must be a list")
         x_size, y_size = window_size
 
         for g in ["--log-level=3", f"--window-size={x_size}x{y_size}"]:
-            options.add_argument(g)
+            self.options.add_argument(g)
 
         if proxy and isinstance(proxy, str):
-            options.add_argument(f"--proxy-server={proxy}")
+            self.options.add_argument(f"--proxy-server={proxy}")
 
         self.driver = webdriver.Chrome(
-            executable_path=self.chromedriver, options=options
+            executable_path=self.chromedriver, options=self.options
         )
 
         self.driver.set_page_load_timeout(self.timeout)
@@ -52,30 +55,7 @@ class Chrome:
         self.session_id = self.driver.session_id
         self.executor_url = self.driver.command_executor._url
 
-    def recycled_driver(self):
-        """ Use the current Chrome instance to load faster """
-        original_execute = WebDriver.execute
-
-        def new_command_execute(self, command, params=None):
-            if command == "newSession":
-                # Mock the response
-                return {"success": 0, "value": None, "sessionId": self.session_id}
-            else:
-                return original_execute(self, command, params)
-
-        # Patch the function before creating the driver object
-        WebDriver.execute = new_command_execute
-        driver = webdriver.Remote(
-            command_executor=self.executor_url,
-            desired_capabilities={}
-        )
-        driver.session_id = self.session_id
-
-        # Replace the patched function with original function
-        WebDriver.execute = original_execute
-        return driver
-
-    def sanitize(self, untrusted_html: str):
+    def sanitize(self, untrusted_html: str) -> str:
         """ Check HTML for bad attempts """
         tag_whitelist = [
             "a", "abbr", "address", "b", "code",
@@ -132,12 +112,12 @@ class Chrome:
                 remove_comments=True
             )
 
-    async def screenshot(self, driver):
+    async def screenshot(self, driver: webdriver.Chrome) -> bytes:
         """ Screenshot from driver """
         image = driver.get_screenshot_as_png()
         return image
 
-    def send(self, driver, cmd, params={}):
+    def send(self, driver, cmd, params={}) -> dict:
         resource = f"/session/{driver.session_id}/chromium/send_command_and_get_result"
         url = driver.command_executor._url + resource
         body = json.dumps({"cmd": cmd, "params": params})
@@ -146,20 +126,25 @@ class Chrome:
             raise Exception(response.get("value"))
         return response.get("value")
 
-    async def render(self, html: str, css: str):
+    async def kill(self):
+        self.driver.quit()
+
+    async def render(self, html: str, css: str) -> bytes:
         """ Make Chrome get a website and screenshot it """
         # Check for bad arguments
         html = self.sanitize(html)
 
         # Create a sanitized HTML string
-        html_website = f"<html><body>" \
-                       f'<div id="capture">{html or "placeholder"}</div><style>{css or ""}</style>' \
-                       "<style>html, body { margin: auto 0; overflow: hidden; }" \
-                       "#capture { display: inline-block; height: auto; width: auto; position: relative; overflow: hidden; }" \
-                       "</style></body></html>"
+        html_website = (
+            f"<html><body>"
+            f'<div id="capture">{html or "placeholder"}</div><style>{css or ""}</style>'
+            "<style>html, body { margin: auto 0; overflow: hidden; }"
+            "#capture { display: inline-block; height: auto; width: auto; position: relative; overflow: hidden; }"
+            "</style></body></html>"
+        )
 
         # Fetch HTML/CSS and screenshot it
-        driver = self.recycled_driver()
+        driver = self.driver
 
         try:
             driver.get(f"data:text/html;charset=utf-8,{urllib.parse.quote(html_website)}")
