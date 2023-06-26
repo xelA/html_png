@@ -1,6 +1,0 @@
-{
-  "apps": [{
-    "name": "Chrome_HTML",
-    "script": "start.sh"
-  }]
-}

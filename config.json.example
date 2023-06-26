@@ -1,8 +1,6 @@
 {
-  "debug": false,
-  "chrome_headless": true,
-  "port": 8575,
-  "chromedriver_path": "./bin/chromedriver.exe",
-  "chrome_timeout": 5,
-  "proxies": []
+  "host": "127.0.0.1",
+  "port": "8080",
+  "default_font": "Times New Roman.ttf",
+  "token": "Remove this if you want no Authorization header"
 }
